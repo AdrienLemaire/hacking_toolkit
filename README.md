@@ -1,5 +1,10 @@
 # hacking_toolkit
 
+**requirements:**
+
+* Python 3
+* python-requests
+
 
 ## SQL Injection
 
